@@ -1,4 +1,3 @@
-
 public class LinkedList<E> {
     private Node<E> head;
     private int size;
@@ -8,9 +7,8 @@ public class LinkedList<E> {
         size = 0;
     }
 
-    public boolean add(E item) {
-        this.add(size, item);
-        return true;
+    public int size() {
+        return this.size;
     }
 
     public E get(int index) {
@@ -27,23 +25,24 @@ public class LinkedList<E> {
         Node<E> node = getNode(index); //setter method is passed an index and item and this line calls getNode on index
         E toReturn = node.item;
         node.item = item;
-
         return toReturn;
     }
 
+    public boolean add(E item) {
+        this.add(size, item);
+        return true;
+    }
+
     public void add(int index, E item) {
-        //Scenario 1 index is out of bounds
-        if (index < 0 || index > size) {
+        if (index < 0 || index > size) { //Scenario 1 index is out of bounds
             throw new IndexOutOfBoundsException("Not a valid index");
         }
 
         Node<E> temp = new Node<E>(item);
-        //Scenario 2: adding a new head
-        if(index == 0) {
+        if(index == 0) { //Scenario 2: adding a new head
             temp.next = head;
             head = temp;
-            //Scenario 3: everything else
-        } else {
+        } else { //Scenario 3: everything else such as the middle or the end
             Node<E> before = getNode(index -1);
             temp.next = before.next;
             before.next = temp;
@@ -53,28 +52,20 @@ public class LinkedList<E> {
 
     public E remove(int index) {
         E toReturn = null;
-        //Scenario 1: out of bounds
-        if (index < 0 || index >= size) {
+        if (index < 0 || index >= size) { //Scenario 1: out of bounds
             throw new IndexOutOfBoundsException("Can't remove that");
         }
-        // removing the head of the list
-        if (index == 0) {
+
+        if (index == 0) { //Scenario 2: removing the head of the list
             toReturn = head.item;
             head = head.next;
-
-        //deleting everything else
-        } else {
+        } else { //Scenario 3: deleting everything else
             Node<E> before = getNode(index - 1);
             toReturn = before.next.item;
             before.next = before.next.next;
         }
-
         size--;
         return toReturn;
-    }
-
-    public int size() {
-        return this.size;
     }
 
     private Node<E> getNode(int index) {
@@ -85,7 +76,6 @@ public class LinkedList<E> {
         return current;
     }
 
-
     //prints the string obviously
     @Override
     public String toString() {
@@ -95,8 +85,6 @@ public class LinkedList<E> {
             output += current.item.toString() + " ";
             current = current.next;
         }
-
-
         return output + "]";
     }
 
@@ -118,12 +106,6 @@ public class LinkedList<E> {
             System.out.println(l);
             l.set(0, "j");
             System.out.println(l);
-
-//            System.out.println(l.remove(0));
-//            System.out.println(l);
-//
-//            System.out.println(l.remove(0));
-//            System.out.println(l);
         }
     }
 }
