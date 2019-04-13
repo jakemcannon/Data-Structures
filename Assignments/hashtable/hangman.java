@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.*;
 
@@ -115,31 +116,29 @@ public class hangman {
         return hidden;
     }
 
+    public static String getRandomWord(List<String> wordlist) {
+        Random random = new Random();
+        return wordlist.get(random.nextInt(wordlist.size()));
+    }
 
-    public static boolean revealLetter(char guess, List newWordList) {
+    public static boolean gameWon(List<String> wordList, HashSet<Character> guessedLetters) {
 
+        if (wordList.size() == 1) {
+            System.out.println("WORDLIST FROM GAMEWON METHOD " + wordList);
+            String word = getHiddenKey(generateWordFamalies(guessedLetters, wordList), guessedLetters);
+            for (Character c : word.toCharArray()) {
+                if (guessedLetters.contains(c)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
-    // String method that builds a String like XXXX
-    public static String createHiddenWord(String s, char guess) {
-        String toReturn = "";
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) != guess) {
-                toReturn += "_";
-            } else {
-                toReturn += guess;
-            }
-        }
-        return toReturn;
-    }
-
-
-
-    public static void main(String[] args) throws FileNotFoundException {
-
+    public static void gameLogic() throws FileNotFoundException {
         HashSet<Character> guessedLetters = new HashSet<>();
-
+        boolean won = false;
+        String playAgain = "";
         getInitialWordLists();
 
         //Initial word length and number of guesses
@@ -155,24 +154,32 @@ public class hangman {
         for (String word: wordListCopy.get(userWordLength)) {
             wordList.add(word);
         }
-        System.out.println("Word list: " + wordList);
 
+        System.out.println("Word list: " + wordList);
         int guessCounter = 0;
+
         while (guessCounter < numberOfGuesses) {
-            System.out.println("Guess a letter");
+            System.out.println("Guess a letter: ");
             char guess = userInput.next().charAt(0);
+            if(guessedLetters.contains(guess)) {
+                System.out.println("You have already made that guess, please make a new guess! ");
+                guess = userInput.next().charAt(0);
+                guessedLetters.add(guess);
+            }
             guessedLetters.add(guess); //add letter to the set of guessed letters
             generateWordFamalies(guessedLetters, wordList); // generate word families
+
             System.out.println("Word families: " + generateWordFamalies(guessedLetters, wordList));
-
-
             System.out.println("New word list is: " + getNewWordList(generateWordFamalies(guessedLetters, wordList), guessedLetters));
-//            System.out.println(getNewWordList(generateWordFamalies(guessedLetters, wordList), guessedLetters));
-            //because the word family currently takes the word family with the largest element
+            String hiddenKey = getHiddenKey(generateWordFamalies(guessedLetters, wordList), guessedLetters);
+            if (hiddenKey.contains("_")) {
+                System.out.println("Word is " + hiddenKey);
+            } else if(!hiddenKey.contains("_")) {
+                won = true;
+                System.out.println("You Won! " + hiddenKey);
+                break;
+            }
 
-
-            System.out.println("Your Guess was incorrect, please try again.");
-            System.out.println("Word is " + getHiddenKey(generateWordFamalies(guessedLetters, wordList), guessedLetters));
             System.out.println("You have " + (numberOfGuesses - guessCounter) + " guesses left");
             System.out.println("You have currently guessed " + guessedLetters);
             System.out.println(" ");
@@ -180,5 +187,22 @@ public class hangman {
             wordList = getNewWordList(generateWordFamalies(guessedLetters, wordList), guessedLetters);
             guessCounter ++;
         }
+
+        if (!won) {
+            String randomWord = getRandomWord(wordList);
+            System.out.println("Out of guesses! The word was: " + randomWord);
+        }
+    }
+
+    public static void main(String[] args) throws FileNotFoundException {
+
+        Scanner userInput = new Scanner(System.in);
+        String playAgain = "y";
+        do {
+            gameLogic();
+            System.out.println("Would you like to play another game? Enter 'y' for yes or 'n' for no: ");
+            playAgain = userInput.next();
+        } while (!playAgain.equals("n"));
+
     }
 }
