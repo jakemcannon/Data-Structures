@@ -180,12 +180,18 @@ public class hangman {
                 break;
             }
 
-            System.out.println("You have " + (numberOfGuesses - guessCounter) + " guesses left");
+            // guessCounter is only incremented in this block
+            // Otherwise the user got a correct guess therefore
+            // their number of remaining guesses will not decrease
+            if (hiddenKey.indexOf(guess) == -1) {
+                guessCounter ++;
+            }
+
+            System.out.println("You have " + (numberOfGuesses - guessCounter) + " guesses left"); //ERROR is happening here
             System.out.println("You have currently guessed " + guessedLetters);
             System.out.println(" ");
 
             wordList = getNewWordList(generateWordFamalies(guessedLetters, wordList), guessedLetters);
-            guessCounter ++;
         }
 
         if (!won) {
